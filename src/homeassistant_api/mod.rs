@@ -1,4 +1,5 @@
 use crate::rest_common::RestClient;
+use http::status::StatusCode;
 use std::collections::HashMap;
 use thiserror::Error;
 
@@ -27,8 +28,15 @@ impl HomeAssistant {
     ) -> Result<HomeAssistantResponse, HomeAssistantClientError> {
         let mut body = HashMap::new();
         body.insert("entity_id", entity_id);
-        let _res = self.client.post("services/switch/toggle", &body).await?;
-        Ok(HomeAssistantResponse::Bokay)
+        let res = self.client.post("services/switch/toggle", &body).await?;
+        match res.status() {
+            StatusCode::OK => Ok(HomeAssistantResponse::Bokay),
+            // Any other response is not ok, just report it back to the user as is after wrapping
+            // it up in a bad BadResponse
+            _ => Err(HomeAssistantClientError::BadResponse {
+                response: res.json().await?,
+            }),
+        }
     }
 }
 
@@ -36,4 +44,7 @@ impl HomeAssistant {
 pub enum HomeAssistantClientError {
     #[error("Error in the RestClient")]
     RestClientError(#[from] reqwest::Error),
+
+    #[error("Bad response from HomeAssistant")]
+    BadResponse { response: String },
 }
