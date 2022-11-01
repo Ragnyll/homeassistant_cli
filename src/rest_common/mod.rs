@@ -24,12 +24,11 @@ impl RestClient {
     /// a get function that assumes no body is required for the request
     /// it is up to the caller to deserialize the response to the desired type
     pub async fn get(&self, endpoint: &str) -> Result<reqwest::Response, reqwest::Error> {
-        Ok(self
-            .client
+        self.client
             .get(format!("{}/{}", self.base_url, endpoint))
             .bearer_auth(&self.bearer_token)
             .send()
-            .await?)
+            .await
     }
 
     /// a post function
@@ -39,12 +38,11 @@ impl RestClient {
         endpoint: &str,
         body: &T,
     ) -> Result<reqwest::Response, reqwest::Error> {
-        Ok(self
-            .client
+        self.client
             .post(format!("{}/{}", self.base_url, endpoint))
             .bearer_auth(&self.bearer_token)
             .json(&body)
             .send()
-            .await?)
+            .await
     }
 }

@@ -16,7 +16,9 @@ pub fn get_homeassistant() -> Result<HomeAssistant, Box<dyn Error>> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let homeassistant = get_homeassistant()?;
-    homeassistant.toggle_switch("switch.kitchen_sun_lamp").await?;
+    homeassistant
+        .toggle_switch("switch.kitchen_sun_lamp")
+        .await?;
 
     Ok(())
 }
