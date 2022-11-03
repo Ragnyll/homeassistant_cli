@@ -3,8 +3,10 @@ use http::status::StatusCode;
 use std::collections::HashMap;
 use thiserror::Error;
 
-mod homeassistant_responses;
-use homeassistant_responses::HomeAssistantResponse;
+pub enum HomeAssistantResponse {
+    Ok,
+    Failure { failure_response: String },
+}
 
 /// The primary wrapper around commands to interact with homeassistant on
 pub struct HomeAssistant {
@@ -29,12 +31,13 @@ impl HomeAssistant {
         let mut body = HashMap::new();
         body.insert("entity_id", entity_id);
         let res = self.client.post("services/switch/toggle", &body).await?;
+        // this would be a good place to write a unit test
         match res.status() {
-            StatusCode::OK => Ok(HomeAssistantResponse::Bokay),
+            StatusCode::OK => Ok(HomeAssistantResponse::Ok),
             // Any other response is not ok, just report it back to the user as is after wrapping
             // it up in a bad BadResponse
             _ => Err(HomeAssistantClientError::BadResponse {
-                response: res.json().await?,
+                response: res.text().await?,
             }),
         }
     }
@@ -45,6 +48,6 @@ pub enum HomeAssistantClientError {
     #[error("Error in the RestClient")]
     RestClientError(#[from] reqwest::Error),
 
-    #[error("Bad response from HomeAssistant")]
+    #[error("Bad response from HomeAssistant: {response}")]
     BadResponse { response: String },
 }

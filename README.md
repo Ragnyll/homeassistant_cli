@@ -16,5 +16,14 @@ For each toggle you will need to obtain the entity_id from the service. This can
 
 ![entity_id_setting](./assets/entity_id_settings_example.png)
 
-<!-- TODO: update this to use a configuration file instead -->
-Update the hashmap of alias to the entity_id.
+You can then assign an alias to the entity in the config file. The config defaults to path `$HOME/.config/hcli/default-config.yml`
+
+Here is an example config you can start with.
+```yaml
+---
+api_base_url: "http://192.168.1.132:8123"
+services:
+  switch:
+    kitchen_lamp:
+      entity_id: switch.kitchen_sun_lamp
+```
