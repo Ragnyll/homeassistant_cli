@@ -27,3 +27,24 @@ services:
     kitchen_lamp:
       entity_id: switch.kitchen_sun_lamp
 ```
+
+## Installation
+Change to the project directory and run:
+```
+cargo install --path .
+```
+
+## Usage
+```
+The CLI for interacting with homeassistant REST APIs
+
+Usage: hcli <COMMAND>
+
+Commands:
+  switch
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help information
+  -V, --version  Print version information
+```
