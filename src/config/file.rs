@@ -59,10 +59,10 @@ impl HomeAssistantConfigurations {
                 return Ok(device.entity_id.clone());
             }
         };
-        return Err(HCLIConfigError::NoSuchDevice {
+        Err(HCLIConfigError::NoSuchDevice {
             service_type: alias.to_string(),
             alias: alias.to_string(),
-        });
+        })
     }
 }
 
