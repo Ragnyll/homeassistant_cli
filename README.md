@@ -35,16 +35,4 @@ cargo install --path .
 ```
 
 ## Usage
-```
-The CLI for interacting with homeassistant REST APIs
-
-Usage: hcli <COMMAND>
-
-Commands:
-  switch
-  help    Print this message or the help of the given subcommand(s)
-
-Options:
-  -h, --help     Print help information
-  -V, --version  Print version information
-```
+Just call `hcli --help` and figure it out.
