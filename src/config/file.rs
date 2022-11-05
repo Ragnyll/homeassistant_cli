@@ -21,7 +21,7 @@ pub struct HomeAssistantConfigurations {
     ///             entity_id: bedroom.lamp
     /// ```
     /// So that is to say the Service type is the Key
-    services: HashMap<String, HashMap<String, Device>>,
+    services: Option<HashMap<String, HashMap<String, Device>>>,
 }
 
 /// A device stored in homeassistant
@@ -35,17 +35,27 @@ pub struct Device {
 
 impl HomeAssistantConfigurations {
     pub fn get_all_service_types(&self) -> HashSet<String> {
-        self.services.clone().into_keys().collect()
+        let mut set = HashSet::new();
+        if let Some(services) = &self.services {
+            services.keys().for_each(|k| {
+                set.insert(k.clone());
+            });
+        };
+        set
     }
 
     /// Gets all the devices of a specific service type, eg all switches
     pub fn get_all_device_aliases_of_services_type(&self, service_type: &str) -> HashSet<String> {
-        self.services
-            .get(service_type)
-            .unwrap_or(&HashMap::new())
-            .clone()
-            .into_keys()
-            .collect()
+        let mut set = HashSet::new();
+        if let Some(services) = &self.services {
+            if let Some(aliases) = services.get(service_type) {
+                aliases.keys().for_each(|k| {
+                    set.insert(k.clone());
+                })
+            }
+        }
+
+        set
     }
 
     /// Gets a device's entity id from its given alias in the conf
@@ -54,11 +64,14 @@ impl HomeAssistantConfigurations {
         service_type: &str,
         alias: &str,
     ) -> Result<String, HCLIConfigError> {
-        if let Some(service) = self.services.get(service_type) {
-            if let Some(device) = service.get(alias) {
-                return Ok(device.entity_id.clone());
+        if let Some(services) = &self.services {
+            if let Some(service) = services.get(service_type) {
+                if let Some(device) = service.get(alias) {
+                    return Ok(device.entity_id.clone());
+                }
             }
-        };
+        }
+
         Err(HCLIConfigError::NoSuchDevice {
             service_type: alias.to_string(),
             alias: alias.to_string(),
@@ -87,7 +100,7 @@ mod test {
 
         HomeAssistantConfigurations {
             api_base_url: String::from("192.168.1.1:8000"),
-            services: ds,
+            services: Some(ds),
         }
     }
 
